@@ -231,7 +231,7 @@ exp.namelist = namelist = Namelist({
 # Lets do a run!
 if __name__=="__main__":
 
-    exp.run(1, use_restart='$GFDL_DATA/restarts/res0036.tar.gz', num_cores=NCORES, overwrite_data=True)
+    exp.run(385, use_restart='$GFDL_DATA/exeter_project_mf_aa_KS_30_72,90/restarts/res0384.tar.gz', num_cores=NCORES, overwrite_data=True)
     #run_exp.run(1, use_restart=False, num_cores=NCORES, overwrite_data=False)
-    for i in range(2,133): # run for 11 years
+    for i in range(386,613): # run for 11 years
         exp.run(i, num_cores=NCORES, overwrite_data=True)

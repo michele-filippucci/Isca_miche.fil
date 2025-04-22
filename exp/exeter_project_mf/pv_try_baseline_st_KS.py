@@ -4,7 +4,7 @@ import numpy as np
 
 from isca import GreyCodeBase, DiagTable, Experiment, Namelist, GFDL_BASE
 
-NCORES = 16
+NCORES =16
 
 # Point to code as defined by $GFDL_BASE
 cb = GreyCodeBase.from_directory(GFDL_BASE)
@@ -15,13 +15,13 @@ cb.compile()  # compile the source code to working directory $GFDL_WORK/codebase
 
 # create an Experiment object to handle the configuration of model parameters
 # and output diagnostics
-exp = Experiment('exeter_project_mf_aa_st_KS_30_72,90', codebase=cb)
+exp = Experiment('exeter_project_mf_baseline_st_KS_wPV', codebase=cb)
 
-exp.inputfiles = [os.path.join(base_dir,'input/qflux_30_72,90_tri.nc')]
+exp.inputfiles = [os.path.join(base_dir,'input/qflux_1tri_heat2.nc')] # put triangle heating file in same folder as python script
 
 #Tell model how to write diagnostics
 diag = DiagTable()
-diag.add_file('atmos_monthly', 30, 'days', time_units='days')
+diag.add_file('atmos_monthly', 1, 'days', time_units='days')
 diag.add_file('atmos_daily', 1, 'days', time_units='days')
 
 #Tell model which diagnostics to write
@@ -34,6 +34,7 @@ diag.add_field('dynamics', 'temp', time_avg=True, files=['atmos_daily'])
 diag.add_field('dynamics', 'ucomp', time_avg=True, files=['atmos_daily'])
 diag.add_field('dynamics', 'vcomp', time_avg=True, files=['atmos_daily'])
 diag.add_field('dynamics', 'height', time_avg=True, files=['atmos_daily'])
+diag.add_field('barotropic_diagnostics', 'pv', time_avg=True, files=['atmos_daily'])
 
 #Tell model which diagnostics to write
 diag.add_field('dynamics', 'ps', time_avg=True, files=['atmos_monthly'])
@@ -55,7 +56,7 @@ exp.clear_rundir()
 #Define values for the 'core' namelist
 exp.namelist = namelist = Namelist({
     'main_nml': {
-        'days'   : 30, # each run lasts one year, and then multiple runs are strung together below (loop on e.g. Line 310)
+        'days'   : 1, # each run lasts one year, and then multiple runs are strung together below (loop on e.g. Line 310)
         'hours'  : 0,   # a different output file is produced for each run (in this case, each year). Data 
         'minutes': 0,   # output at the frequency specified in the diag table 
         'seconds': 0,
@@ -119,12 +120,13 @@ exp.namelist = namelist = Namelist({
         'delta_T': 40., # DEFAULT: 40. 
                         # delta_T in expression above 
         'evaporation':True, # allow surface evaporation and associated latent heat flux 
-        'do_qflux': True,  # do prescribed ocean heat transport out of tropics
+        'do_qflux': True,  # do prescribed ocean heat transport out of tropics 
                            # -- not in O'Gorman and Schneider, configured with qflux_nml
-        'land_option':'none',
+        'land_option':'none', 
         'load_qflux':True, #load triangle heating function
         'time_varying_qflux' : False, #triangle heating function will not be time-varying
-        'qflux_file_name':'qflux_30_72,90_tri',
+        'qflux_file_name' : 'qflux_1tri_heat2', #Name of triangle heating function input file
+        #'qflux_field_name' : 'qflux_1tri_NHheat2', #Name of triangle heating function input file
         
     },
     
@@ -231,7 +233,11 @@ exp.namelist = namelist = Namelist({
 # Lets do a run!
 if __name__=="__main__":
 
-    exp.run(385, use_restart='$GFDL_DATA/exeter_project_mf_aa_30_72,90_st_KS/restarts/res0384.tar.gz', num_cores=NCORES, overwrite_data=True)
-    #run_exp.run(1, use_restart=False, num_cores=NCORES, overwrite_data=False)
-    for i in range(386,613): # run for 11 years
-        exp.run(i, num_cores=NCORES, overwrite_data=True)
+    #exp.run(133, use_restart='$GFDL_DATA/exeter_project_mf_baseline_st_KS/restarts/res0132.tar.gz', num_cores=NCORES, overwrite_data=True)
+    exp.run(1, use_restart=False, num_cores=NCORES, overwrite_data=True)
+    #for i in range(134,265): # run for 11 years
+    #    exp.run(i, num_cores=NCORES, overwrite_data=True)
+
+        
+        
+

@@ -25,7 +25,7 @@ exp = Experiment('frierson_test_experiment', codebase=cb)
 
 #Tell model how to write diagnostics
 diag = DiagTable()
-diag.add_file('atmos_monthly', 30, 'days', time_units='days')
+diag.add_file('atmos_daily', 1, 'days', time_units='days')
 
 #Tell model which diagnostics to write
 diag.add_field('dynamics', 'ps', time_avg=True)
@@ -48,7 +48,7 @@ exp.clear_rundir()
 #Define values for the 'core' namelist
 exp.namelist = namelist = Namelist({
     'main_nml':{
-     'days'   : 30,
+     'days'   : 1,
      'hours'  : 0,
      'minutes': 0,
      'seconds': 0,

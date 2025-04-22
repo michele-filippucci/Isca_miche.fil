@@ -4,7 +4,7 @@ import numpy as np
 
 from isca import GreyCodeBase, DiagTable, Experiment, Namelist, GFDL_BASE
 
-NCORES = 16
+NCORES =16
 
 # Point to code as defined by $GFDL_BASE
 cb = GreyCodeBase.from_directory(GFDL_BASE)
@@ -15,9 +15,9 @@ cb.compile()  # compile the source code to working directory $GFDL_WORK/codebase
 
 # create an Experiment object to handle the configuration of model parameters
 # and output diagnostics
-exp = Experiment('exeter_project_mf_aa_st_KS_30_72,90', codebase=cb)
+exp = Experiment('exeter_project_mf_baseline_st_KS_qflux100', codebase=cb)
 
-exp.inputfiles = [os.path.join(base_dir,'input/qflux_30_72,90_tri.nc')]
+exp.inputfiles = [os.path.join(base_dir,'input/qflux_1tri_heat2.nc')] # put triangle heating file in same folder as python script
 
 #Tell model how to write diagnostics
 diag = DiagTable()
@@ -119,17 +119,18 @@ exp.namelist = namelist = Namelist({
         'delta_T': 40., # DEFAULT: 40. 
                         # delta_T in expression above 
         'evaporation':True, # allow surface evaporation and associated latent heat flux 
-        'do_qflux': True,  # do prescribed ocean heat transport out of tropics
+        'do_qflux': True,  # do prescribed ocean heat transport out of tropics 
                            # -- not in O'Gorman and Schneider, configured with qflux_nml
-        'land_option':'none',
+        'land_option':'none', 
         'load_qflux':True, #load triangle heating function
         'time_varying_qflux' : False, #triangle heating function will not be time-varying
-        'qflux_file_name':'qflux_30_72,90_tri',
+        'qflux_file_name' : 'qflux_1tri_heat2', #Name of triangle heating function input file
+        #'qflux_field_name' : 'qflux_1tri_NHheat2', #Name of triangle heating function input file
         
     },
     
     'qflux_nml':{
-        'qflux_amp':50., # amplitude of q-flux heat transport out of tropics 
+        'qflux_amp':100., # amplitude of q-flux heat transport out of tropics 
     }, 
 
     'qe_moist_convection_nml': { # Namelist for simple betts--miller convection 
@@ -231,7 +232,11 @@ exp.namelist = namelist = Namelist({
 # Lets do a run!
 if __name__=="__main__":
 
-    exp.run(385, use_restart='$GFDL_DATA/exeter_project_mf_aa_30_72,90_st_KS/restarts/res0384.tar.gz', num_cores=NCORES, overwrite_data=True)
+    exp.run(1, use_restart='$GFDL_DATA/restarts/res0036.tar.gz', num_cores=NCORES, overwrite_data=True)
     #run_exp.run(1, use_restart=False, num_cores=NCORES, overwrite_data=False)
-    for i in range(386,613): # run for 11 years
+    for i in range(2,133): # run for 11 years
         exp.run(i, num_cores=NCORES, overwrite_data=True)
+
+        
+        
+
